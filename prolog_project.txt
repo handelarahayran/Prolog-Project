@@ -1,0 +1,43 @@
+% We define each month as a tuple of the form Month(Number, Days).
+% Number is the month number from 1 to 12, and Days is the number of days in that month.
+
+month(1, 31). % January
+month(2, 28). % February
+month(3, 31). % March
+month(4, 30). % April
+month(5, 31). % May
+month(6, 30). % June
+month(7, 31). % July
+month(8, 31). % August
+month(9, 30). % September
+month(10, 31). % October
+month(11, 30). % November
+month(12, 31). % December
+
+% Split string date into Month and Day
+split_string(String, Month, Day) :-
+    atom_number(String, Number),
+    Month is Number // 100,
+    Day is Number - (Number // 100)*100.
+
+% Add days to a date.
+add_date(Day, Month, Add, ResultDay, ResultMonth) :-
+  month(Month, DaysInMonth),
+  TempDay is Day + Add,
+  (TempDay =< DaysInMonth ->
+    ResultDay = TempDay, ResultMonth = Month
+  ;
+    NewAdd is TempDay - DaysInMonth,
+    NewMonth is (Month mod 12) + 1,
+    add_date(1, NewMonth, NewAdd, ResultDay, ResultMonth)).
+
+% Subtract days from a date.
+subtract_date(Day, Month, Subtract, ResultDay, ResultMonth) :-
+  (Day > Subtract
+    -> ResultDay is Day - Subtract,
+        ResultMonth = Month
+    ; 
+        PrevMonth is ((Month - 2) mod 12) + 1,
+        month(PrevMonth, PrevMonthDays),
+        NewSubtract is Subtract - Day,
+        subtract_date(PrevMonthDays, PrevMonth, NewSubtract, ResultDay, ResultMonth)).
